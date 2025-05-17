@@ -1,23 +1,11 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { toast } from "@/components/ui/sonner";
-
-// We'll import FFmpeg dynamically since we can't modify package.json
-type FFmpeg = {
-  load: () => Promise<void>;
-  isLoaded: () => boolean;
-  run: (commands: string[]) => Promise<void>;
-  FS: {
-    writeFile: (name: string, data: Uint8Array) => void;
-    readFile: (name: string) => Uint8Array;
-    unlink: (name: string) => void;
-  };
-};
+import { toast } from "sonner";
+import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 
 const VideoSplitter: React.FC = () => {
   const [video, setVideo] = useState<File | null>(null);
@@ -45,14 +33,13 @@ const VideoSplitter: React.FC = () => {
     // Load FFmpeg
     const loadFFmpeg = async () => {
       try {
-        // Dynamic import of FFmpeg
-        const FFmpeg = (await import("@ffmpeg/ffmpeg")).createFFmpeg({
+        const ffmpeg = createFFmpeg({
           log: true,
           corePath: "https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js",
         });
         
-        await FFmpeg.load();
-        ffmpegRef.current = FFmpeg;
+        await ffmpeg.load();
+        ffmpegRef.current = ffmpeg;
         setFfmpegLoaded(true);
         toast.success("FFmpeg loaded successfully!");
       } catch (error) {

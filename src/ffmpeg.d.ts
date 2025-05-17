@@ -16,4 +16,3 @@ declare module '@ffmpeg/ffmpeg' {
 
   export function fetchFile(file: File | string | URL): Promise<Uint8Array>;
 }
-
